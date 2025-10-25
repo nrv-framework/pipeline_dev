@@ -9,8 +9,9 @@ def add(a, b):
     """
     return a + b
 
+
 def subtract(a, b):
-    """ 
+    """
     Returns the difference of two numbers.
     Args:
         a (int, float): The first number.
