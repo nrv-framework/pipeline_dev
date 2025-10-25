@@ -7,19 +7,25 @@ on:
 
 jobs:
   build:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest]
-        python-version: [3.11, 3.12]
-    name: Python ${{ matrix.python-version }} example
+    runs-on: ubuntu-latest
+    name: Python  example
     steps:
       - uses: actions/checkout@v3
-      - name: Setup conda
-        uses: s-weigand/setup-conda@v1
+      - name: Setup mamba
+      - uses: mamba-org/setup-micromamba@v2
         with:
-          update-conda: true
-          python-version: ${{ matrix.python-version }}
-          conda-channels: anaconda, conda-forge
-      - run: conda --version
-      - run: which python
+        environment-file: environment.yml
+        init-shell: >-
+            bash
+            powershell
+        cache-environment: true
+        post-cleanup: 'all'
+      - name: Import numpy in micromamba environment (bash)
+        run: python -c "import numpy"
+        shell: bash -el {0}
+      - name: Import numpy in micromamba environment (pwsh)
+        run: python -c "import numpy"
+        shell: pwsh
+      - name: Run custom command in micromamba environment
+        run: pytest --version
+        shell: micromamba-shell {0}
