@@ -20,7 +20,7 @@ jobs:
             cache-environment: true
             post-cleanup: 'all'
       - name: Import numpy in micromamba environment (bash)
-        run: pip install -e 
+        run: pip install -e .
         shell: bash -el {0}
       - name: Run custom command in micromamba environment
         run: pytest --version
