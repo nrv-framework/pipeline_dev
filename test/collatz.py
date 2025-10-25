@@ -1,5 +1,5 @@
 import pytest
-from src.collatz import collatz
+from ..src.collatz import collatz
 
 def test_collatz():
     assert collatz(6) == 3

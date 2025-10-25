@@ -1,6 +1,6 @@
 import pytest
 
-from src.math import add, subtract 
+from ..src.math import add, subtract 
 
 def test_add():
     assert add(2, 3) == 5
