@@ -3,4 +3,4 @@ __author__ == "the NRV framework contributors"
 __license__ == "MIT"
 
 from .collatz import collatz_sequence
-from .math import add, subtract
+from .smath import add, subtract
