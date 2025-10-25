@@ -9,7 +9,8 @@ setup(
     author="the NRV framework contributors",
     description='A sample Python project for NRV framework pipeline development',
     packages=find_packages(where="src"),
-    package_dir={"": "src"},
+    package_dir={"": ""
+    ""},
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
