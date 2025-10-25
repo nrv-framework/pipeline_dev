@@ -8,7 +8,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    name: Python  example
+    name: Setup micromamba and run tests
     steps:
       - uses: actions/checkout@v3
       - uses: mamba-org/setup-micromamba@v2
@@ -22,6 +22,10 @@ jobs:
       - name: Import numpy in micromamba environment (bash)
         run: pip install -e .
         shell: bash -el {0}
-      - name: Run custom command in micromamba environment
+      - name: Check pytest version (micromamba shell)
         run: pytest --version
         shell: micromamba-shell {0}
+      - name: Run tests with coverage (micromamba shell)
+        run: pytest --cov=nrvplinet
+        shell: micromamba-shell {0}
+    

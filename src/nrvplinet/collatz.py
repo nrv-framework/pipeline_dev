@@ -9,8 +9,8 @@ def collatz(n: int):
     """
     if n <= 0:
         raise ValueError("Input must be a positive integer.")
-    while n != 1:
-        if n // 2 == 0:
+    else:
+        if n % 2 == 0:
             return n / 2
         else:
             return 3 * n + 1
