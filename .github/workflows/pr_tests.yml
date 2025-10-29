@@ -1,0 +1,53 @@
+name: Lint
+
+on: 
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches:
+      - master
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: psf/black@stable
+        with:
+          options: "--check --verbose"
+          src: "./src"
+          version: "~= 22.0"
+
+  merge:
+    needs: lint
+    if: ${{ success() }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check if PR is approved and merge
+        env:
+          GH_TOKEN: ${{ secrets.NRV_TOKEN_GITHUB }}
+        run: |
+          approvals=$(gh pr view ${{ github.event.pull_request.number }} \
+            --repo ${{ github.repository }} \
+            --json reviews \
+            --jq '[.reviews[] | select(.state=="APPROVED") | .author.login] | unique | length')
+
+          echo "Approvals count: $approvals"
+
+          if [ "$approvals" -gt 0 ]; then
+            echo "✅ PR approved — merging..."
+            gh pr merge ${{ github.event.pull_request.number }} \
+              --repo ${{ github.repository }} \
+              --squash \
+              --delete-branch
+          else
+            echo "🕓 Waiting for PR approval. Skipping merge."
+            exit 0
+          fi
