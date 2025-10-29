@@ -19,4 +19,4 @@ jobs:
 
     steps:
       - name: Print the bump type
-        run: echo Performing  ${{ inputs.bump-type }}
+        run: echo "Performing  " ${{ inputs.bump-type }}
