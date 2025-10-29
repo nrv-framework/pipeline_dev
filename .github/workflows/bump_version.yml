@@ -16,6 +16,8 @@ on:
 jobs:
   print-username:
     runs-on: ubuntu-latest
+    permissions:                # Job-level permissions configuration starts here
+      contents: write  
 
     steps:
       - name: Version bump type
@@ -28,9 +30,8 @@ jobs:
             bump2version ${{ inputs.bump-type }}
       - name: Push changes
         run: |
-            
-            git push
-            git push --tags
             git config --global user.name "github-actions[bot]"
             git config --global user.email "github-actions[bot]@users.noreply.github.com"
-            git push origin HEAD:master --follow-tags 
+            git push origin HEAD:master --follow-tags
+            git push
+            git push --tags
