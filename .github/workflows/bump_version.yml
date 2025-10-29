@@ -1,0 +1,22 @@
+name: Bump Version
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump-type:
+        description: 'Version bump type'
+        required: true
+        default: 'patch'
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+
+jobs:
+  print-username:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Print the bump type
+        run: echo "Performing  " ${{ inputs.bump-type }}
