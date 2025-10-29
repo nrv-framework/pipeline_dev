@@ -26,7 +26,7 @@ jobs:
         uses: actions/checkout@v4
         with:
             fetch-depth: 0          # get all history for tags
-            ref: meature_test       # change branch if needed
+            ref: feature_test       # change branch if needed
       - name: Setup git user
         run: |
             git config --global user.name "github-actions[bot]"
@@ -39,5 +39,5 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.NRV_TOKEN_GITHUB }}
         run: |
-          git push origin eature_test
-          git push origin eature_test --tags
+          git push origin feature_test
+          git push origin feature_test --tags
