@@ -6,7 +6,7 @@ on:
       bump-type:
         description: 'Version bump type'
         required: true
-        default: 'patch'
+        default: patch
         type: choice
         options:
           - patch
@@ -21,7 +21,7 @@ jobs:
 
     steps:
       - name: Version bump type
-        run: echo "Performing  " ${{ inputs.bump-type }}
+        run: echo Performing ${{ inputs.bump-type }}
       - name: Checkout repository
         uses: actions/checkout@v4
       - name: Bump version
