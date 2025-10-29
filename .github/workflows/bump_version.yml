@@ -16,7 +16,22 @@ on:
 jobs:
   print-username:
     runs-on: ubuntu-latest
+    permissions:                # Job-level permissions configuration starts here
+      contents: write  
 
     steps:
-      - name: Print the bump type
+      - name: Version bump type
         run: echo "Performing  " ${{ inputs.bump-type }}
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Bump version
+        run: |
+            pip install bump2version
+            bump2version ${{ inputs.bump-type }}
+      - name: Push changes
+        run: |
+            git config --global user.name "github-actions[bot]"
+            git config --global user.email "github-actions[bot]@users.noreply.github.com"
+            git push origin HEAD:master --follow-tags
+            git push
+            git push --tags
