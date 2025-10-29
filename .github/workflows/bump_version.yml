@@ -24,6 +24,9 @@ jobs:
         run: echo Performing ${{ inputs.bump-type }}
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+            fetch-depth: 0          # get all history for tags
+            ref: feature_test       # change branch if needed
       - name: Setup git user
         run: |
             git config --global user.name "github-actions[bot]"
@@ -33,7 +36,8 @@ jobs:
             pip install bump2version
             bump2version ${{ inputs.bump-type }}
       - name: Push changes
+        env:
+          GITHUB_TOKEN: ${{ secrets.NRV_TOKEN_GITHUB }}
         run: |
-            git push origin HEAD:master --follow-tags
-            git push
-            git push --tags
+          git push origin feature_test
+          git push origin feature_test --tags
