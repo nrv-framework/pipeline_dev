@@ -19,9 +19,6 @@ Please delete options that are not relevant.
 
 Please describe the tests that you ran to verify your changes. Provide instructions so we can reproduce. 
 
-- [ ] Test A
-- [ ] Test B
-
 ## Checklist:
 
 - [ ] My code follows the style guidelines of this project
