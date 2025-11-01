@@ -1,14 +1,12 @@
-name: Code Testing
+name: pytest
 
 on:
-    push:
-      branches: [feature_test]
-    pull_request:
+  workflow_call:
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    name: Setup micromamba and run tests
+    name: pytest
     steps:
       - uses: actions/checkout@v3
       - uses: mamba-org/setup-micromamba@v2

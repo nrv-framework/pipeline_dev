@@ -1,4 +1,4 @@
-name: Lint
+name: main_pipeline
 
 on: 
   pull_request:
@@ -11,7 +11,11 @@ permissions:
   pull-requests: write
 
 jobs:
+  pytest:
+    uses: ./.github/workflows/code_testing.yml 
+
   lint:
+    needs: pytest
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -21,8 +25,14 @@ jobs:
           src: "./src"
           version: "~= 22.0"
 
-  merge:
+  deploy:
     needs: lint
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "🚀 Deploying application..."
+
+  merge:
+    needs: deploy
     if: ${{ success() }}
     runs-on: ubuntu-latest
 
@@ -42,12 +52,12 @@ jobs:
           echo "Approvals count: $approvals"
 
           if [ "$approvals" -gt 0 ]; then
-            echo "✅ PR approved — merging..."
+            echo "PR approved — merging..."
             gh pr merge ${{ github.event.pull_request.number }} \
               --repo ${{ github.repository }} \
               --squash \
               --delete-branch
           else
-            echo "🕓 Waiting for PR approval. Skipping merge."
+            echo "Waiting for PR approval. Skipping merge."
             exit 0
           fi
