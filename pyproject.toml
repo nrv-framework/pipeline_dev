@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "nrvplinet"
+version = "1.0.1"
+description = "A sample Python project for NRV framework pipeline development"
+readme = "README.md"
+requires-python = ">=3.7"
+authors = [
+    { name = "the NRV framework contributors" }
+]
+license = { text = "MIT" }  # Remplace si nécessaire
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent"
+]
+[project.urls]
+Homepage = "https://nrv-framework.org"
+Repository = "https://github.com/NRV-framework/pipeline_dev.git"
+
+[tool.setuptools.packages.find]
+where = ["src"]
