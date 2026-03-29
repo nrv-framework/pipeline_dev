@@ -1,14 +1,8 @@
 name: Lint
 
-on: [push, pull_request]
+on:
+  push:
 
 jobs:
   lint:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: psf/black@stable
-        with:
-          options: "--check --verbose"
-          src: "./src"
-          version: "~= 22.0"
+    uses: ./.github/workflows/lint_job.yml

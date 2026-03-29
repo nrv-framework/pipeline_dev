@@ -1,0 +1,55 @@
+name: Build and Push Docker image
+
+on:
+  workflow_run:
+    workflows: ["Publish Python 🐍 distributions 📦 to test PyPI"]
+    types: [completed]
+
+jobs:
+  build-and-push:
+    # only if the previous workflow succeeded
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+          fetch-depth: 0
+      - name: Get latest git tag
+        id: get_tag
+        run: |
+          TAG=$(git describe --tags --abbrev=0)
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+          echo "🧩 Last detected tag : $TAG"
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: all 
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Log in to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./docker
+          file: ./docker/Dockerfile
+          push: true
+          # 🏷️ three tags will be pushed:
+          # - latest
+          # - the git tag that represent the package version
+          # - the commit's SHA
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/nrvplinet:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/nrvplinet:${{ steps.get_tag.outputs.tag }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/nrvplinet:sha-${{ github.sha }}
+          platforms: linux/amd64,linux/arm64,linux/arm/v7,linux/ppc64le,linux/s390x
+          build-args: |
+            PACKAGE_VERSION=${{ steps.get_tag.outputs.tag }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

@@ -12,24 +12,25 @@ permissions:
 
 jobs:
   pytest:
-    uses: ./.github/workflows/code_testing.yml 
+    uses: ./.github/workflows/code_testing.yml
 
   lint:
     needs: pytest
+    uses: ./.github/workflows/lint_job.yml
+
+  wait-for-approval:
+    needs: [pytest, lint]
     runs-on: ubuntu-latest
+    environment:
+      name: production
     steps:
-      - uses: actions/checkout@v4
-      - uses: psf/black@stable
-        with:
-          options: "--check --verbose"
-          src: "./src"
-          version: "~= 22.0"
+      - run: echo "Waiting for approval to continue the pipeline."
 
   deploy:
-    needs: lint
+    needs: wait-for-approval
     runs-on: ubuntu-latest
     steps:
-      - run: echo "🚀 Deploying application..."
+      - run: echo "Deploy step placeholder for the future staging or production target."
 
   merge:
     needs: deploy
