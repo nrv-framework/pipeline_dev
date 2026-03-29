@@ -43,7 +43,7 @@ jobs:
 
       - name: Check if PR is approved and merge
         env:
-          GH_TOKEN: ${{ secrets.NRV_TOKEN_GITHUB }}
+          GH_TOKEN: ${{ github.token }}
         run: |
           approvals=$(gh pr view ${{ github.event.pull_request.number }} \
             --repo ${{ github.repository }} \
