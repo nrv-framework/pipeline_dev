@@ -5,7 +5,7 @@ def collatz(n: int):
     Returns:
             int: The next number in the Collatz sequence
     Raises:
-        ValueError: If n is not a positive integer
+        ValueError: If n is not a positive integer.
     """
     if n <= 0:
         raise ValueError("Input must be a positive integer.")
