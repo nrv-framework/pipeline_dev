@@ -1,0 +1,33 @@
+name: Deploy to Production Repository
+
+on:
+  push:
+    branches:
+      - master  # Trigger when code is pushed to main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout development repository
+        uses: actions/checkout@v4
+
+      - name: Set up Git
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+
+      - name: Clone production repository using token
+        env:
+          PROD_TOKEN: ${{ secrets.NRV_TOKEN_GITHUB }}
+        run: |
+          git clone https://x-access-token:${PROD_TOKEN}@github.com/nrv-framework/pipeline_staging.git prod
+          
+      - name: Copy files to production repo
+        run: |
+          rsync -av --exclude='.git' --exclude='.github' ./ ./prod/
+          cd prod
+          git add .
+          git commit -m "Deploy from dev repo: $GITHUB_SHA" || echo "No changes to commit"
+          git push -f origin master

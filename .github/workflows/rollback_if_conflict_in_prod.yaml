@@ -1,0 +1,79 @@
+# To test 
+
+name: Auto Merge to Prod with Rollback on Failure
+
+on:
+  pull_request:
+    branches:
+      - prod
+    types: [closed]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  merge-to-prod:
+    if: ${{ github.event.pull_request.merged == true }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout prod branch
+        uses: actions/checkout@v4
+        with:
+          ref: prod
+          fetch-depth: 0  # Required for revert operations
+
+      - name: Configure Git identity
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Attempt merge of PR into prod
+        id: merge
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "Attempting to merge PR #${{ github.event.pull_request.number }} into prod..."
+
+          git fetch origin pull/${{ github.event.pull_request.number }}/head:temp-pr-branch
+
+          # Try to merge (non-fast-forward)
+          if ! git merge --no-ff temp-pr-branch -m "Merge PR #${{ github.event.pull_request.number }} into prod"; then
+            echo "❌ Merge conflict detected. Aborting merge."
+            git merge --abort
+            exit 1
+          fi
+
+          # Push the merge
+          git push origin prod
+
+      - name: Rollback merge on failure
+        if: failure()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "🚨 Merge failed — attempting to rollback by reverting last commit..."
+          git fetch origin prod
+          git checkout prod
+
+          last_commit=$(git rev-parse HEAD)
+          echo "Last commit before revert: $last_commit"
+
+          # Try to revert safely
+          git revert --no-edit $last_commit || {
+            echo "⚠️ Revert caused conflict, aborting revert..."
+            git revert --abort
+            exit 1
+          }
+
+          git push origin prod
+          echo "✅ Rollback completed successfully."
+
+      - name: Comment on PR about rollback
+        if: failure()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr comment ${{ github.event.pull_request.number }} \
+            --body "⚠️ The automatic merge into **prod** failed and has been rolled back via a revert commit."
